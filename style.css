@@ -1,0 +1,13 @@
+body{
+    background-color: #DADADA;
+    text-align: center;
+}
+
+.canvas{
+    
+    width: 300px;
+    height: 500px;
+    background-color: whitesmoke;
+    border-radius: 3px;
+    display: inline;
+}
