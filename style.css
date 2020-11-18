@@ -3,10 +3,8 @@ body{
     text-align: center;
 }
 
-.canvas{
+canvas{
     
-    width: 300px;
-    height: 500px;
     background-color: whitesmoke;
     border-radius: 3px;
     display: inline;
