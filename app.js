@@ -1,13 +1,12 @@
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 
-//document.addEventListener("keydown",keyDownEvent);
+document.addEventListener("keydown",keyDownEvent,false);
 
-let width = 10;
-let height = 20;
+const width = 10;
+const height = 20;
 
-let blockSize = 28;
-
+const tic = 5;
 
 const shape =[
     [1,3,5,7],//|
@@ -19,10 +18,10 @@ const shape =[
     [2,3,4,5]
 ]
 
-var map = new Array(20);
-for(var i=0; i<20; i++){
-    map[i] = new Array(10);
-    map[i] = 0;
+var map = new Array(height);
+for(var i=0; i<height; i++){
+    map[i] = new Array(width);
+    map[i] = false;
 }
 
 class block{
@@ -31,26 +30,10 @@ class block{
         this.x = x;
         this.y = y;
     }
-    Draw(){
-        bDraw(this.x,this.y);
-    }
-    Eraise(){
-        bEraise(this.x,this.y);
-        //ctx.clearRect(30*this.X+2, 30*this.Y+2, 26, 26);
-    }
 };
 ctx.lineWidth = 5;
 ctx.strokeStyle = "black";
 var b = new Array(4);
-//for(var i=0; i<4; i++){
-//   // b[i] = new block();
-//}
-
-//
-//var map = new Array(20);
-//for(var i=0; i<20; i++){
-//    map[i] = new Array(10);
-//}
 
 function blockSetup(){
     var r = Math.floor(Math.random()*7);
@@ -58,30 +41,91 @@ function blockSetup(){
     for(var i=0; i<4; i++) {
         const x = figure[i] % 2 + 4;
         const y = parseInt(figure[i] / 2);
+        b[i] = null;
         b[i] = new block(x,y);
     }
 }
-function bDraw(x,y) {
-    ctx.fillRect(30*x+1,30*y+1,28,28);
-}
-function bEraise(x,y){
-    ctx.clearRect(30*x,30*y,30,30);
-}
-
-function collided(){
-
-}
-
-function collidCheck(){
+function bDraw() {
     for(var i=0; i<4; i++){
-        if(map[b[i].x][b[i].y+1]){
-            return true;
+        ctx.fillRect(30*b[i].x+1,30*b[i].y+1,28,28);
+    }
+}
+function bEraise(){
+    for(var i=0; i<4; i++){
+        ctx.clearRect(30*b[i].x,30*b[i].y,30,30);
+    }
+}
+
+function collidFloor(){
+    for(var i=0; i<4; i++){
+        map[b[i].y][b[i].x] = true;
+        console.log(map);
+    }
+}
+
+function drawMap(){
+    for(var i=0; i<height; i++){
+        for(var j=0; j<width; j++){
+            if(map[i][j]){
+                ctx.fillRect(30*j+1,30*i+1,28,28);
+            }
         }
     }
+}
+
+function bMove(mx,my){
+    for(var i=0; i<4; i++){
+        b[i].x += mx;
+        b[i].y += my;
+    }
+}
+
+function collidCheckY(){
     for(var i=0; i<4; i++){
         if(b[i].y == 19){
             return true;
         }
+        else if(map[b[i].y+1][b[i].x]){
+            return true;
+        }
+    }
+    return false;
+}
+
+function collidCheckR(){
+    for(var i=0; i<4; i++){
+        if(b[i].x == 9){
+            return false;
+        }
+        else if(map[b[i].y][b[i].x+1]){
+            return false;
+        }
+    }
+    return true;
+}
+
+function collidCheckL(){
+    for(var i=0; i<4; i++){
+        if(b[i].x == 0){
+            return false;
+        }
+        else if(map[b[i].y][b[i].x-1]){
+            return false;
+        }
+    }
+    return true;
+}
+
+function keyDownEvent(e){
+    if(e.keyCode == 39 && collidCheckR()){
+        bEraise();
+        bMove(1,0);
+        bDraw();
+    }
+    if(e.keyCode == 37 && collidCheckL()){
+        bEraise();
+        bMove(-1,0);
+        bDraw();
     }
 }
 
@@ -89,28 +133,20 @@ blockSetup();
 
 var t = 0;
 function main(){
-    if(t==10){
-        for(var i=0; i<4; i++){
-            b[i].Eraise();
+    bEraise();
+    if(t==tic){
+        if(collidCheckY()){
+            collidFloor();
+            
+            drawMap();
+            
+            blockSetup();
         }
-        for(var i=0; i<4; i++){
-            b[i].y += 1;
-            b[i].Draw();
-        }
-        if(collidCheck()){
-            collided();
-            console.log('collid!!');
-        }
-
+        bMove(0,1);
         t=0;
     }
-    /*
-    for(var i=0; i<height; i++){
-        for(var j=0; j<width; j++){
-
-        }
-    }
-    */
+    bDraw();
+    
     t++;
 }
 
