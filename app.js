@@ -1,24 +1,36 @@
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
+const body = document.querySelector("body");
 
 document.addEventListener("keydown",keyDownEvent,false);
 
 const width = 10;
 const height = 20;
 
-const tic = 5;
+const tic = 500;
 
 const shape =[
     [1,3,5,7],//|
     [2,4,5,7],//Z
     [3,5,4,6],//S
     [3,5,4,7],//T
-    [2,3,5,7],//L
+    [2,5,3,7],//L
     [3,5,7,6],//J
     [2,3,4,5] //ㅁ
 ]
 
-let rShape;
+var rShape;
+/*
+var pauseScreen = document.createElement('div');
+pauseScreen.style.background = 'black';
+pauseScreen.style.width = screenX;
+pauseScreen.style.height = screenY;
+*/
+var Pause = false;
+
+var gameover = false;
+
+var score = 0;
 
 var map = new Array(height);
 for(var i=0; i<height; i++){
@@ -33,7 +45,7 @@ class point{
 };
 var b = new Array(4);
 
-var loop = setInterval(main, 100);
+var loop = setInterval(main, tic);
 
 function blockSetup(){
     rShape = Math.floor(Math.random()*7);
@@ -74,21 +86,16 @@ function collidFloor(){
                 for(var w=0; w<width; w++){
                     map[h][w] = map[h-1][w];
                 }
+                score += 5;
             }
             drawMap();
         }
     }
-    
+    score++;
 }
 
 function clearMap(){
-    for(var i=0; i<height; i++){
-        for(var j=0; j<width; j++){
-            if(map[i][j]){
-                ctx.clearRect(30*j+1,30*i+1,28,28);
-            }
-        }
-    }
+    ctx.clearRect(0,0,width,height);
 }
 
 function drawMap(){
@@ -170,60 +177,85 @@ function collidCheckL(){
 }
 
 function keyDownEvent(e){
-    if(e.keyCode == 68 && collidCheckR()){//D
-        bEraise();
-        bMove(1,0);
-        bDraw();
-    }
-    if(e.keyCode == 65 && collidCheckL()){//A
-        bEraise();
-        bMove(-1,0);
-        bDraw();
-    }
-    if(e.keyCode == 32){//space
-        bEraise();
-        while(collidCheckY()){
-            bMove(0,1);
+    if(Pause){
+        resume();
+    }else{
+        if(e.keyCode == 68 && collidCheckR()){//D
+            bEraise();
+            bMove(1,0);
+            bDraw();
         }
-        collidFloor();
-        drawMap();
-        bDraw();
-    }
-    if(e.keyCode == 37){//<--
-        bEraise();
-        rotate(-1);
-        bDraw();
-    }
-    if(e.keyCode == 39){//-->
-        bEraise();
-        rotate(1);
-        bDraw();
+        if(e.keyCode == 65 && collidCheckL()){//A
+            bEraise();
+            bMove(-1,0);
+            bDraw();
+        }
+        if(e.keyCode == 32){//space
+            bEraise();
+            while(collidCheckY()){
+                bMove(0,1);
+            }
+            collidFloor();
+            drawMap();
+            bDraw();
+        }
+        if(e.keyCode == 37){//<--
+            bEraise();
+            rotate(-1);
+            bDraw();
+        }
+        if(e.keyCode == 39){//-->
+            bEraise();
+            rotate(1);
+            bDraw();
+        }
+        if(e.keyCode == 27){
+            pause();
+        }
     }
 }
 
 function gameOver(){
+    gameover = true;
+    pause();
+}
+
+function resume(){
+    Pause = false;
+    if(gameover){
+        map = null;
+        map = new Array(height);
+        for(var i=0; i<height; i++){
+            map[i] = new Array(width);
+        }
+        clearMap();
+        gameover = false;
+    }else{
+        loop = setInterval(main, tic);
+        //body.removeChild(pauseScreen);
+    }
+}
+
+function pause(){
+    Pause = true;
     clearInterval(loop);
+    //pauseScreen.textContent = 'Score : '+score;
+    //document.appendChild(pauseScreen);
+
 }
 
 blockSetup();
 
-var t = 0;
 function main(){
-    
-    if(t==tic){
-        bEraise();
-        if(!collidCheckY()){
-            collidFloor();
-            
-            drawMap();
-            
-            blockSetup();
-        }
-        bMove(0,1);
-        bDraw();
-        t=0;
+    bEraise();
+    if(!collidCheckY()){
+        collidFloor();
+        
+        drawMap();
+        
+        blockSetup();
     }
-    
-    t++;
+    bMove(0,1);
+    bDraw();
 }
 
