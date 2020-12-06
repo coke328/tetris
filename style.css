@@ -1,11 +1,9 @@
 body{
     background-color: #DADADA;
     text-align: center;
+    margin: 0px;
 }
 
 canvas{
     background-color: whitesmoke;
-    border-radius: 3px;
-    display: inline;
-    z-index: 1;
 }

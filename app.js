@@ -4,8 +4,11 @@ const body = document.querySelector("body");
 
 document.addEventListener("keydown",keyDownEvent,false);
 
-const width = 10;
-const height = 20;
+const canvasX = 300;
+const canvasY = 600;
+
+const blockX = 10;
+const blockY = 20;
 
 const tic = 500;
 
@@ -23,8 +26,8 @@ var rShape;
 /*
 var pauseScreen = document.createElement('div');
 pauseScreen.style.background = 'black';
-pauseScreen.style.width = screenX;
-pauseScreen.style.height = screenY;
+pauseScreen.style.blockX = screenX;
+pauseScreen.style.blockY = screenY;
 */
 var Pause = false;
 
@@ -32,9 +35,9 @@ var gameover = false;
 
 var score = 0;
 
-var map = new Array(height);
-for(var i=0; i<height; i++){
-    map[i] = new Array(width);
+var map = new Array(blockY);
+for(var i=0; i<blockY; i++){
+    map[i] = new Array(blockX);
 }
 
 class point{
@@ -53,7 +56,7 @@ function blockSetup(){
     for(var i=0; i<4; i++) {
         const x = figure[i] % 2 + 4;
         const y = parseInt(figure[i] / 2)-1;
-        if(y>=0 && map[y][x]){gameOver(); break;}
+        if(map[y][x]){gameOver(); break;}
         b[i] = null;
         b[i] = new point(x,y);
     }
@@ -76,14 +79,14 @@ function collidFloor(){
         var y = b[i].y;
         map[y][x] = true;
         var count = 0;
-        for(var j=0; j<width; j++){
+        for(var j=0; j<blockX; j++){
             if(map[y][j]) {count++;}
             else {break;}
         }
         if(count == 10){
             clearMap();
             for(var h=y; h>0; h--){
-                for(var w=0; w<width; w++){
+                for(var w=0; w<blockX; w++){
                     map[h][w] = map[h-1][w];
                 }
                 score += 5;
@@ -95,12 +98,12 @@ function collidFloor(){
 }
 
 function clearMap(){
-    ctx.clearRect(0,0,width,height);
+    ctx.clearRect(0,0,canvasX,canvasY);
 }
 
 function drawMap(){
-    for(var i=0; i<height; i++){
-        for(var j=0; j<width; j++){
+    for(var i=0; i<blockY; i++){
+        for(var j=0; j<blockX; j++){
             if(map[i][j]){
                 ctx.fillRect(30*j+1,30*i+1,28,28);
             }
@@ -215,33 +218,45 @@ function keyDownEvent(e){
     }
 }
 
+function loadMenu(){
+    var buttonX = 80;
+    var buttonY = 30;
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(0,0,canvasX,canvasY);
+    //ctx.fillStyle = 'white';
+    ctx.clearRect((canvasX-buttonX)/2,(canvasY-buttonY)/2,buttonX,buttonY);
+    ctx.strokeRect((canvasX-buttonX)/2,(canvasY-buttonY)/2,buttonX,buttonY);
+    ctx.fillStyle = 'black';
+}
+
 function gameOver(){
     gameover = true;
     pause();
+    loadMenu();
 }
 
 function resume(){
     Pause = false;
+    clearMap();
     if(gameover){
         map = null;
-        map = new Array(height);
-        for(var i=0; i<height; i++){
-            map[i] = new Array(width);
+        map = new Array(blockY);
+        for(var i=0; i<blockY; i++){
+            map[i] = new Array(blockX);
         }
-        clearMap();
-        gameover = false;
+        gameover = !gameover;
+        blockSetup();
     }else{
-        loop = setInterval(main, tic);
-        //body.removeChild(pauseScreen);
+        bDraw();
+        drawMap();
     }
+    loop = setInterval(main, tic);
 }
 
 function pause(){
     Pause = true;
     clearInterval(loop);
-    //pauseScreen.textContent = 'Score : '+score;
-    //document.appendChild(pauseScreen);
-
+    loadMenu();
 }
 
 blockSetup();
