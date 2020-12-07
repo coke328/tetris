@@ -23,12 +23,7 @@ const shape =[
 ]
 
 var rShape;
-/*
-var pauseScreen = document.createElement('div');
-pauseScreen.style.background = 'black';
-pauseScreen.style.blockX = screenX;
-pauseScreen.style.blockY = screenY;
-*/
+
 var Pause = false;
 
 var gameover = false;
@@ -56,7 +51,7 @@ function blockSetup(){
     for(var i=0; i<4; i++) {
         const x = figure[i] % 2 + 4;
         const y = parseInt(figure[i] / 2)-1;
-        if(map[y][x]){gameOver(); break;}
+        if(y>=0 && map[y][x]){gameOver(); break;}
         b[i] = null;
         b[i] = new point(x,y);
     }
@@ -219,13 +214,12 @@ function keyDownEvent(e){
 }
 
 function loadMenu(){
-    var buttonX = 80;
-    var buttonY = 30;
     ctx.fillStyle = 'rgba(0,0,0,0.5)';
     ctx.fillRect(0,0,canvasX,canvasY);
-    //ctx.fillStyle = 'white';
-    ctx.clearRect((canvasX-buttonX)/2,(canvasY-buttonY)/2,buttonX,buttonY);
-    ctx.strokeRect((canvasX-buttonX)/2,(canvasY-buttonY)/2,buttonX,buttonY);
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'center';
+    ctx.font = '30px arial';
+    ctx.fillText("Press Any Key",150,300);
     ctx.fillStyle = 'black';
 }
 
